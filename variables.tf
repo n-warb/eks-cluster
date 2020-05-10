@@ -13,7 +13,6 @@ variable "subnet_count" {
 
 
 variable "accessing_computer_ip" {
-  default = "31.125.165.98"
 }
 
 
