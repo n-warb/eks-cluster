@@ -1,8 +1,8 @@
-#eks-cluster
+# eks-cluster
 Code for creating an AWS EKS cluster, the node groups are not managed by AWS and, therefore will not 
 appear in the EKS console view. The code allows the setting of bootstrap parameters.
 
-##Instructions for use:
+## Instructions for use:
 1. Clone the repository:
     ```git clone git@github.com:n-warb/eks-cluster.git```
 1. Verify that you are using aws-cli version 2.0.12 +
