@@ -1,6 +1,6 @@
-resource "aws_security_group" "tf-eks-master" {
-  name = "terraform-eks-cluster"
-  description = "Cluster communication with worker nodes"
+resource "aws_security_group" "master_security_group" {
+  name = "cluster-sg"
+  description = "SG used for cluster communication with worker nodes"
   vpc_id = var.vpc_id
 
   egress {
@@ -12,6 +12,6 @@ resource "aws_security_group" "tf-eks-master" {
   }
 
   tags = {
-    Name = "terraform-eks"
+    Name = "cluster-sg"
   }
 }

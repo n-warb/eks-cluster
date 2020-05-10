@@ -1,6 +1,6 @@
 # Setup for IAM role needed to setup an EKS cluster
-resource "aws_iam_role" "tf-eks-master" {
-  name = "terraform-eks-cluster"
+resource "aws_iam_role" "eks_master_role" {
+  name = "eks-cluster-role"
 
   assume_role_policy = <<POLICY
 {
@@ -18,22 +18,22 @@ resource "aws_iam_role" "tf-eks-master" {
 POLICY
 }
 
-resource "aws_iam_role_policy_attachment" "tf-cluster-AmazonEKSClusterPolicy" {
+resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role = aws_iam_role.tf-eks-master.name
+  role = aws_iam_role.eks_master_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "tf-cluster-AmazonEKSServicePolicy" {
+resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-  role = aws_iam_role.tf-eks-master.name
+  role = aws_iam_role.eks_master_role.name
 }
 
 
 ########################################################################################
 # Setup IAM role & instance profile for worker nodes
 
-resource "aws_iam_role" "tf-eks-node" {
-  name = "terraform-eks-tf-eks-node"
+resource "aws_iam_role" "eks_node" {
+  name = "eks-node-role"
 
   assume_role_policy = <<POLICY
 {
@@ -51,22 +51,22 @@ resource "aws_iam_role" "tf-eks-node" {
 POLICY
 }
 
-resource "aws_iam_role_policy_attachment" "tf-eks-node-AmazonEKSWorkerNodePolicy" {
+resource "aws_iam_role_policy_attachment" "node_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role = aws_iam_role.tf-eks-node.name
+  role = aws_iam_role.eks_node.name
 }
 
-resource "aws_iam_role_policy_attachment" "tf-eks-node-AmazonEKS_CNI_Policy" {
+resource "aws_iam_role_policy_attachment" "node_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role = aws_iam_role.tf-eks-node.name
+  role = aws_iam_role.eks_node.name
 }
 
-resource "aws_iam_role_policy_attachment" "tf-eks-node-AmazonEC2ContainerRegistryReadOnly" {
+resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role = aws_iam_role.tf-eks-node.name
+  role = aws_iam_role.eks_node.name
 }
 
-resource "aws_iam_instance_profile" "node" {
+resource "aws_iam_instance_profile" "node_profile" {
   name = "terraform-eks-node"
-  role = aws_iam_role.tf-eks-node.name
+  role = aws_iam_role.eks_node.name
 }

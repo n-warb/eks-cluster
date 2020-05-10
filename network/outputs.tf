@@ -6,8 +6,9 @@ output "subnet_application_0_id" {
   value = aws_subnet.application.0.id
 }
 
-output "subnet_application" {
-  value = aws_subnet.application.*
+output "application_subnets" {
+  //  "${join("\",\"", aws_instance.workers.*.id)}"
+  value = aws_subnet.application[*].id
 }
 
 

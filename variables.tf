@@ -16,11 +16,11 @@ variable "accessing_computer_ip" {
 }
 
 
-variable "eks-cluster-name" {
+variable "eks_cluster_name" {
   default = "infrastructure-cluster"
 }
 
-variable "keypair-name" {
+variable "keypair_name" {
   default = "infrastructure-cluster-keypair"
 }
 

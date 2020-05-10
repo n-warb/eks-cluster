@@ -4,7 +4,7 @@ module "network" {
   // pass variables from .tfvars
   aws_region = var.aws_region
   subnet_count = var.subnet_count
-  cluster-name = var.eks-cluster-name
+  cluster-name = var.eks_cluster_name
 }
 
 
@@ -18,13 +18,14 @@ module "cluster" {
   vpc_id = module.network.vpc_id
   app_subnet_id0 = module.network.subnet_application_0_id
   app_subnet_id1 = module.network.subnet_application_1_id
-  eks_cluster-name = var.eks-cluster-name
-  app_subnet = module.network.subnet_application
-  keypair-name = var.keypair-name
+  application_subnets = module.network.application_subnets
+  eks_cluster_name = var.eks_cluster_name
+  keypair_name = var.keypair_name
 }
 
 module "keys" {
   source = "./keys"
 
-  keypair-name = var.keypair-name
+  // pass variables from .tfvars
+  keypair_name = var.keypair_name
 }

@@ -1,5 +1,5 @@
-resource "aws_security_group" "tf-eks-node" {
-  name = "terraform-eks-node"
+resource "aws_security_group" "node_security_group" {
+  name = "node_security_group"
   description = "Security group for all nodes in the cluster"
   vpc_id = var.vpc_id
 
@@ -12,6 +12,6 @@ resource "aws_security_group" "tf-eks-node" {
   }
 
   tags = {
-    Name = "terraform-eks"
+    Name = "node_security_group"
   }
 }

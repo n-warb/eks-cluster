@@ -1,5 +1,8 @@
 # Setup data source to get amazon-provided AMI for EKS nodes
-data "aws_ami" "eks-worker" {
+# The latest images from AWS can be found here:
+# https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
+# if we set values: "amazon-eks-node-*" then the image grabbed will be K8s version 1.12.10
+data "aws_ami" "worker_ami_definition" {
   filter {
     name = "name"
     values = ["amazon-eks-node-*"]
@@ -35,22 +38,22 @@ locals {
   tf-eks-node-userdata = <<USERDATA
 #!/bin/bash
 set -o xtrace
-/etc/eks/bootstrap.sh '${var.eks_cluster-name}' --apiserver-endpoint '${aws_eks_cluster.tf_eks.endpoint}' --b64-cluster-ca '${aws_eks_cluster.tf_eks.certificate_authority.0.data}'
+/etc/eks/bootstrap.sh '${var.eks_cluster_name}' --apiserver-endpoint '${aws_eks_cluster.eks_cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.eks_cluster.certificate_authority.0.data}'
 USERDATA
 }
 
 //AMI ID obtained from here: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 //This is for eu-west-1:
 
-resource "aws_launch_configuration" "tf_eks" {
+resource "aws_launch_configuration" "cluster_launch_config" {
   associate_public_ip_address = true
-  iam_instance_profile = aws_iam_instance_profile.node.name
-  image_id = data.aws_ami.eks-worker.id
+  iam_instance_profile = aws_iam_instance_profile.node_profile.name
+  image_id = data.aws_ami.worker_ami_definition.id
   instance_type = "t3.large"
   name_prefix = "terraform-eks"
-  security_groups = [aws_security_group.tf-eks-node.id]
+  security_groups = [aws_security_group.node_security_group.id]
   user_data_base64 = base64encode(local.tf-eks-node-userdata)
-  key_name = var.keypair-name
+  key_name = var.keypair_name
 
   lifecycle {
     create_before_destroy = true
@@ -58,9 +61,9 @@ resource "aws_launch_configuration" "tf_eks" {
 }
 
 
-resource "aws_autoscaling_group" "tf_eks" {
+resource "aws_autoscaling_group" "cluster_autoscaling_config" {
   desired_capacity = "2"
-  launch_configuration = aws_launch_configuration.tf_eks.id
+  launch_configuration = aws_launch_configuration.cluster_launch_config.id
   health_check_grace_period = 300
   max_size = "3"
   min_size = "1"
@@ -69,13 +72,13 @@ resource "aws_autoscaling_group" "tf_eks" {
 
   //  "${join("\",\"", aws_instance.workers.*.id)}"
   tag {
-    key = "kubernetes.io/cluster/${var.eks_cluster-name}"
+    key = "kubernetes.io/cluster/${var.eks_cluster_name}"
     value = "owned"
     propagate_at_launch = true
   }
 
   tag {
-    key = "k8s.io/cluster-autoscaler/${var.eks_cluster-name}"
+    key = "k8s.io/cluster-autoscaler/${var.eks_cluster_name}"
     value = "owned"
     propagate_at_launch = true
   }

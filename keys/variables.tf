@@ -1,2 +1,2 @@
-variable "keypair-name" {
+variable "keypair_name" {
 }
