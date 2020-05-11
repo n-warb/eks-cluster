@@ -5,7 +5,7 @@
 data "aws_ami" "worker_ami_definition" {
   filter {
     name = "name"
-    values = ["amazon-eks-node-*"]
+    values = ["amazon-eks-node-1.15*"]
   }
 
   filter {
@@ -38,7 +38,7 @@ locals {
   tf-eks-node-userdata = <<USERDATA
 #!/bin/bash
 set -o xtrace
-/etc/eks/bootstrap.sh '${var.eks_cluster_name}' --apiserver-endpoint '${aws_eks_cluster.eks_cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.eks_cluster.certificate_authority.0.data}'
+/etc/eks/bootstrap.sh '${var.eks_cluster_name}' --enable-docker-bridge true --apiserver-endpoint '${aws_eks_cluster.eks_cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.eks_cluster.certificate_authority.0.data}'
 USERDATA
 }
 
