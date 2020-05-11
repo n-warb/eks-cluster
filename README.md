@@ -1,5 +1,5 @@
 # eks-cluster
-Code for creating an AWS EKS cluster, the node groups are not managed by AWS and, therefore will not 
+Code for creating an AWS EKS unmanaged cluster (unmanaged in that the worker nodes are created via terraform and added to the cluster via terraform), the node groups are not managed by AWS and, therefore will not 
 appear in the EKS console view. The code allows the setting of bootstrap parameters.
 
 ## Instructions for use:
@@ -77,6 +77,15 @@ appear in the EKS console view. The code allows the setting of bootstrap paramet
    kubectl get nodes --all-namespaces --watch
    ```
    You should see your nodes go into a ready state
+   
+   This project makes use of the following modules:
+   
+   [cluster module](./cluster/README.md)
+   
+   [keys module](./keys/README.md)
+   
+   [network module](./network/README.md)
+   
    
 
 
