@@ -14,6 +14,12 @@ nodes do not appear in the "managed list" of worker nodes.
 |application_subnets|The associated subnet to use for cluster construction
 |app_subnet_id0|application subnet [0] - used for node creation
 |app_subnet_id1|application subnet [1] - used for node creation
+|cloudwatch_retention|period of time (days) to retain cloudwatch logs **default=7**
+|enabled_cluster_log_types|"The cluster log types to store - see the following https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html **default = ["api", "audit", "authenticator"]**
+|scaling_max_size|max autoscaling size **default = 3**
+|scaling_min_size|min autoscaling size **default = 1**
+|scaling_desired_size|desired size for autoscaling group **default = 2**
+|instance_type|scaling default type for VM **default = "t3.large"**
 
 
 ###Outputs

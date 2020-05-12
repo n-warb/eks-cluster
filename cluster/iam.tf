@@ -66,6 +66,12 @@ resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryReadOn
   role = aws_iam_role.eks_node.name
 }
 
+//attach a role to the nodes to allow system manager to access the nodes
+resource "aws_iam_role_policy_attachment" "node_AmazonSSMManagedInstanceCore" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role = aws_iam_role.eks_node.name
+}
+
 resource "aws_iam_instance_profile" "node_profile" {
   name = "terraform-eks-node"
   role = aws_iam_role.eks_node.name

@@ -35,10 +35,17 @@ data "aws_ami" "worker_ami_definition" {
 # information and write it into the AutoScaling Launch Configuration.
 # More information: https://docs.aws.amazon.com/eks/latest/userguide/launch-workers.html
 locals {
-  tf-eks-node-userdata = <<USERDATA
+  node-userdata = <<USERDATA
 #!/bin/bash
 set -o xtrace
+echo '${var.eks_cluster_name}'
+# Install the Session Manager Agent to SSH into the EKS nodes.
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+systemctl enable amazon-ssm-agent
+systemctl restart amazon-ssm-agent
 /etc/eks/bootstrap.sh '${var.eks_cluster_name}' --enable-docker-bridge true --apiserver-endpoint '${aws_eks_cluster.eks_cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.eks_cluster.certificate_authority.0.data}'
+# after the bootstrap, restart the kubelet service (this will allow the nodes to connect to the cluster)
+systemctl restart kubelet.service
 USERDATA
 }
 
@@ -49,10 +56,10 @@ resource "aws_launch_configuration" "cluster_launch_config" {
   associate_public_ip_address = true
   iam_instance_profile = aws_iam_instance_profile.node_profile.name
   image_id = data.aws_ami.worker_ami_definition.id
-  instance_type = "t3.large"
-  name_prefix = "terraform-eks"
+  instance_type = var.instance_type
+  name_prefix = "eks-cluster-${var.eks_cluster_name}"
   security_groups = [aws_security_group.node_security_group.id]
-  user_data_base64 = base64encode(local.tf-eks-node-userdata)
+  user_data_base64 = base64encode(local.node-userdata)
   key_name = var.keypair_name
 
   lifecycle {
@@ -62,15 +69,15 @@ resource "aws_launch_configuration" "cluster_launch_config" {
 
 
 resource "aws_autoscaling_group" "cluster_autoscaling_config" {
-  desired_capacity = "2"
+  desired_capacity = var.scaling_desired_size
   launch_configuration = aws_launch_configuration.cluster_launch_config.id
   health_check_grace_period = 300
-  max_size = "3"
-  min_size = "1"
-  name = "terraform-tf-eks"
+  max_size = var.scaling_max_size
+  min_size = var.scaling_min_size
+  name = "${var.eks_cluster_name}-autoscaling"
+  //  "${join("\",\"", aws_instance.workers.*.id)}"
   vpc_zone_identifier = [var.app_subnet_id0, var.app_subnet_id1]
 
-  //  "${join("\",\"", aws_instance.workers.*.id)}"
   tag {
     key = "kubernetes.io/cluster/${var.eks_cluster_name}"
     value = "owned"
@@ -89,11 +96,21 @@ resource "aws_autoscaling_group" "cluster_autoscaling_config" {
     propagate_at_launch = true
   }
 
-
   tag {
     key = "Name"
-    value = "terraform-tf-eks"
+    value = "${var.eks_cluster_name}-autoscaling"
     propagate_at_launch = true
   }
 
+  tag {
+    key = "role"
+    value = "eks-worker"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "k8s.io/cluster-autoscaler/enabled"
+    value = "true"
+    propagate_at_launch = true
+  }
 }
