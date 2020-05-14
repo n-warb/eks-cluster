@@ -10,14 +10,7 @@ variable "aws_region" {
   description = "Used AWS Region."
 }
 
-variable "application_subnets" {
-}
-
-
-variable "app_subnet_id0" {
-}
-
-variable "app_subnet_id1" {
+variable "application_subnet_ids" {
 }
 
 variable "eks_cluster_name" {

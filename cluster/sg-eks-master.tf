@@ -1,5 +1,5 @@
-resource "aws_security_group" "master_security_group" {
-  name = "cluster-sg"
+resource "aws_security_group" "master" {
+  name = "cluster_ssecurity_group"
   description = "SG used for cluster communication with worker nodes"
   vpc_id = var.vpc_id
 
@@ -12,6 +12,6 @@ resource "aws_security_group" "master_security_group" {
   }
 
   tags = {
-    Name = "cluster-sg"
+    Name = "${var.eks_cluster_name}-master_cluster_security_group"
   }
 }

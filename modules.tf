@@ -16,9 +16,7 @@ module "cluster" {
   aws_region = var.aws_region
   // inputs from modules
   vpc_id = module.network.vpc_id
-  app_subnet_id0 = module.network.subnet_application_0_id
-  app_subnet_id1 = module.network.subnet_application_1_id
-  application_subnets = module.network.application_subnets
+  application_subnet_ids = module.network.application_subnet_ids
   eks_cluster_name = var.eks_cluster_name
   keypair_name = var.keypair_name
 }

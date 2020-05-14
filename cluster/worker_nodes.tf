@@ -52,13 +52,13 @@ USERDATA
 //AMI ID obtained from here: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 //This is for eu-west-1:
 
-resource "aws_launch_configuration" "cluster_launch_config" {
+resource "aws_launch_configuration" "cluster" {
   associate_public_ip_address = true
   iam_instance_profile = aws_iam_instance_profile.node_profile.name
   image_id = data.aws_ami.worker_ami_definition.id
   instance_type = var.instance_type
   name_prefix = "eks-cluster-${var.eks_cluster_name}"
-  security_groups = [aws_security_group.node_security_group.id]
+  security_groups = [aws_security_group.node.id]
   user_data_base64 = base64encode(local.node-userdata)
   key_name = var.keypair_name
 
@@ -68,15 +68,14 @@ resource "aws_launch_configuration" "cluster_launch_config" {
 }
 
 
-resource "aws_autoscaling_group" "cluster_autoscaling_config" {
+resource "aws_autoscaling_group" "cluster" {
   desired_capacity = var.scaling_desired_size
-  launch_configuration = aws_launch_configuration.cluster_launch_config.id
+  launch_configuration = aws_launch_configuration.cluster.id
   health_check_grace_period = 300
   max_size = var.scaling_max_size
   min_size = var.scaling_min_size
   name = "${var.eks_cluster_name}-autoscaling"
-  //  "${join("\",\"", aws_instance.workers.*.id)}"
-  vpc_zone_identifier = [var.app_subnet_id0, var.app_subnet_id1]
+  vpc_zone_identifier = var.application_subnet_ids
 
   tag {
     key = "kubernetes.io/cluster/${var.eks_cluster_name}"

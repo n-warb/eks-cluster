@@ -18,6 +18,4 @@ This module creates a VPC with the following content:
 |Output|Description|
 |:-----|:----------|
 |vpc_id|The associated VPC identifier|
-|subnet_application_0_id|id associated with application subnet [0]
-|subnet_application_1_id|id associated with application subnet [1]
-|application_subnets|tuple containing all application subnets
+|application_subnet_ids|tuple containing all application subnet ids
